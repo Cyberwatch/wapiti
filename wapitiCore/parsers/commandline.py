@@ -247,6 +247,14 @@ def parse_args():
     )
 
     parser.add_argument(
+        "--jwt",
+        default=argparse.SUPPRESS,
+        help="Set a JWT token use for every request for authenticated scan.",
+        metavar="JWT",
+        dest="jwt"
+    )
+
+    parser.add_argument(
         "--drop-set-cookie",
         action="store_true",
         help="Ignore Set-Cookie header from HTTP responses"
