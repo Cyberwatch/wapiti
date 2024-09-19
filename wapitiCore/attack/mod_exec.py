@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+import re
 from os.path import join as path_join
 from typing import Optional, Iterator
 
@@ -86,6 +87,19 @@ class ModuleExec(Attack):
         """
         invalid_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.css', '.js', '.woff', '.woff2', '.svg', '.ico']
         return not any(url.lower().endswith(ext) for ext in invalid_extensions)
+
+    @staticmethod
+    def _match_rule(rule, content):
+        """
+        Match the rule against the response content.
+        If the rule starts with 'regex:', use regular expression matching.
+        Otherwise, treat it as a simple substring search.
+        """
+        if rule.startswith("regex:"):
+            pattern = rule[len("regex:"):]
+            return re.search(pattern, content) is not None  # Regex match
+
+        return rule in content  # Simple substring match
 
     async def attack(self, request: Request, response: Optional[Response] = None):
         warned = False
@@ -196,7 +210,7 @@ class ModuleExec(Attack):
                 vuln_info = None
 
                 # No timeout raised, check for patterns in response
-                if any(rule in response.content for rule in payload_info.rules):
+                if any(self._match_rule(rule, response.content) for rule in payload_info.rules):
                     vuln_info = payload_info.description
                     # We reached maximum exploitation for this parameter, don't send more payloads
                     vulnerable_parameter = True
