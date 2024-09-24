@@ -149,7 +149,7 @@ The aforementioned attacks are tied to the following module names :
 + timesql (SQL injection vulnerabilities detected with time-based methodology)
 + upload (File upload vulnerabilities)
 + wapp (Not an attack module, retrieves web technologies with versions and categories in use on the target)
-+ wp_enum (Enumerate plugins and themes on a Wordpress website)
++ wp_enum Detect WordPress Plugins with version - DEPRECATED (replaced by the module cms)
 + xss (XSS injection module)
 + xxe (XML External Entity attack)
 
