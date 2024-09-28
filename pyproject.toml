@@ -48,7 +48,6 @@ dependencies = [
         "markupsafe==2.1.5",
         "mitmproxy==10.2.3",
         "pyasn1==0.5.1",
-        "six==1.16.0",
         "sqlalchemy==2.0.28",
         "tld==0.13",
         "typing-extensions==4.10.0",
