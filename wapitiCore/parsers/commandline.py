@@ -227,10 +227,10 @@ def parse_args():
     )
 
     parser.add_argument(
-        "-sf", "--side-file",
+        "--sf", "--side-file",
         help=(
-            "Set a JSON cookie file to use. "
-            "You can also pass 'firefox' or 'chrome' to load cookies from your browser."
+            "Set a .side file to use. "
+            "You can authenticate by providing a .side file, which contains the login steps recorded with Selenium IDE."
         ),
         default=argparse.SUPPRESS,
         metavar="SIDE_FILE"
