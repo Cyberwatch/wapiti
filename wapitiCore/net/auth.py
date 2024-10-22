@@ -250,11 +250,21 @@ async def authenticate_with_side_file(
     Authenticate using a .side file.
     """
     # Load and parse the .side file
-    with open(side_file_path, 'r', encoding='utf-8') as file:
-        try:
-            side_data = json.load(file)
-        except json.JSONDecodeError as json_error:
-            raise ValueError("The file content is not valid JSON.") from json_error
+    try:
+        # Attempt to open the file
+        with open(side_file_path, 'r', encoding='utf-8') as file:
+            # Load JSON data from the file
+            try:
+                side_data = json.load(file)
+            except json.JSONDecodeError:
+                logging.error("The file content is not valid JSON.")
+                sys.exit(1)
+
+
+    except (FileNotFoundError, AttributeError):
+        logging.error(f"Unable to load auth script '{side_file_path}'. Check path, access rights or syntax.")
+        sys.exit(1)
+
 
     url = side_data['url']
     login_test = side_data['tests'][0]  # Assuming the first test is the login test

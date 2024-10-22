@@ -234,10 +234,9 @@ async def wapiti_main():
         wap.set_wait_time(args.wait_time)
 
         if "side_file" in args:
-            if os.path.isfile(args.side_file):
-                wap.crawler_configuration.cookies = await authenticate_with_side_file(
-                    wap.crawler_configuration, args.side_file, args.headless
-                )
+            wap.crawler_configuration.cookies = await authenticate_with_side_file(
+                wap.crawler_configuration, args.side_file, args.headless
+            )
 
         if "cookie" in args:
             if os.path.isfile(args.cookie):

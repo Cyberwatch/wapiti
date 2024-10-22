@@ -227,7 +227,7 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--sf", "--side-file",
+        "--side-file",
         help=(
             "Set a .side file to use. "
             "You can authenticate by providing a .side file, which contains the login steps recorded with Selenium IDE."
