@@ -31,26 +31,26 @@ classifiers = [
         "Topic :: Software Development :: Testing"
 ]
 dependencies = [
-        "aiocache==0.12.2",
-        "aiohttp==3.10.2",
+        "aiocache==0.12.3",
+        "aiohttp==3.11.11",
         "aiosqlite==0.20.0",
         "arsenic==21.8",
         "beautifulsoup4==4.12.3",
-        "browser-cookie3==0.19.1",
-        "dnspython==2.6.1",
+        "browser-cookie3==0.20.1",
+        "dnspython==2.7.0",
         "h11==0.14.0",
-        "httpcore==1.0.4",
+        "httpcore==1.0.7",
         "httpx[brotli, socks]==0.27.0",
         "httpx-ntlm==1.4.0",
-        "humanize==4.9.0",
-        "loguru==0.7.2",
-        "mako==1.3.2",
-        "markupsafe==2.1.5",
-        "mitmproxy==10.4.2",
-        "pyasn1==0.5.1",
-        "sqlalchemy==2.0.28",
+        "humanize==4.11.0",
+        "loguru==0.7.3",
+        "mako==1.3.8",
+        "markupsafe==3.0.2",
+        "mitmproxy==11.0.2",
+        "pyasn1==0.6.1",
+        "sqlalchemy==2.0.37",
         "tld==0.13",
-        "typing-extensions==4.10.0",
+        "typing-extensions==4.11.0",
         "yaswfp==0.9.3",
         "prance[osv]>=23.6.21.0"
 ]
@@ -65,11 +65,11 @@ wapiti-getcookie = "wapitiCore.main.getcookie:getcookie_asyncio_wrapper"
 
 [project.optional-dependencies]
 test = [
-        "humanize==4.9.0",
-        "pytest==8.0.2",
-        "pytest-cov==4.1.0",
-        "pytest-asyncio==0.23.5",
-        "respx==0.20.2",
+        "humanize==4.11.0",
+        "pytest==8.3.4",
+        "pytest-cov==6.0.0",
+        "pytest-asyncio==0.25.2",
+        "respx==0.22.0",
 ]
 
 [tool.setuptools.packages]
