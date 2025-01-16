@@ -24,7 +24,7 @@ import os
 from shutil import copytree, rmtree, copy
 from urllib.parse import urlparse
 import time
-from pkg_resources import resource_filename
+from importlib import resources
 
 from mako.template import Template
 
@@ -71,16 +71,16 @@ class HTMLReportGenerator(JSONReportGenerator):
                     pass
 
                 copytree(
-                    resource_filename("wapitiCore", os.path.join(self.REPORT_DIR, subdir)),
+                    str(resources.files("wapitiCore").joinpath(self.REPORT_DIR, subdir)),
                     os.path.join(output_path, subdir)
                 )
 
-            copy(resource_filename("wapitiCore", os.path.join(self.REPORT_DIR, "logo_clear.png")), output_path)
+            copy(str(resources.files("wapitiCore").joinpath(self.REPORT_DIR, "logo_clear.png")), output_path)
         else:
-            copytree(resource_filename("wapitiCore", self.REPORT_DIR), output_path)
+            copytree(str(resources.files("wapitiCore").joinpath(self.REPORT_DIR)), output_path)
 
         mytemplate = Template(
-            filename=resource_filename("wapitiCore", os.path.join(self.REPORT_DIR, "report.html")),
+            filename=str(resources.files("wapitiCore").joinpath(self.REPORT_DIR, "report.html")),
             input_encoding="utf-8",
             output_encoding="utf-8"
         )
