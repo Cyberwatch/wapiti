@@ -18,7 +18,7 @@ RUN pip3 install . --break-system-packages
 
 FROM debian:bookworm-slim
 
-ARG firefox_ver=129.0
+ARG firefox_ver=134.0
 ARG geckodriver_ver=0.35.0
 
 ENV DEBIAN_FRONTEND=noninteractive \
