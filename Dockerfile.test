@@ -1,7 +1,9 @@
-FROM ubuntu:22.04
+FROM python:3.12-slim
 
 ENV DEBIAN_FRONTEND=noninteractive \
   LANG=en_US.UTF-8 \
+  LANGUAGE=en_US:en \
+  LC_ALL=en_US.UTF-8 \
   PYTHONDONTWRITEBYTECODE=1 \
   PATH=$PATH:/opt/firefox \
   OPENSSL_CONF='/etc/wapiti/openssl_conf'
@@ -10,7 +12,7 @@ ARG firefox_ver=134.0
 ARG geckodriver_ver=0.35.0
 
 RUN apt update \
-  && apt install ca-certificates python3 python3-pip python3-setuptools php8.1-cli php8.1-xml sslscan libgtk-3-0 xvfb curl bzip2 -y \
+  && apt install php-cli php-xml sslscan libgtk-3-0 xvfb curl bzip2 -y \
   --no-install-recommends --no-install-suggests \
   && apt-get install -y --no-install-recommends --no-install-suggests \
     `apt-cache depends firefox-esr | awk '/Depends:/{print$2}'` \
@@ -31,19 +33,13 @@ RUN apt update \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
   && truncate -s 0 /var/log/*log
 
-RUN update-ca-certificates
-RUN python3 -c "import sys; print(sys.version)"
-RUN python3 -m pip install --upgrade pip
-RUN pip3 install -U setuptools --no-cache-dir
-RUN mkdir /usr/src/app
-
-ENV LANG=en_US.UTF-8
-ENV LANGUAGE=en_US:en
-ENV LC_ALL=en_US.UTF-8
+RUN pip install --upgrade pip \
+    && python3 -c "import sys; print(sys.version)" \
+    && mkdir /usr/src/app
 
 WORKDIR /usr/src/app
 
 COPY . .
 
-RUN pip3 install .[test] --no-cache-dir
+RUN pip install .[test] --no-cache-dir
 CMD ["pytest"]

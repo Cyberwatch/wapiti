@@ -149,7 +149,7 @@ class ModuleWapp(Attack):
 
     def __init__(self, crawler, persister, attack_options, crawler_configuration):
         Attack.__init__(self, crawler, persister, attack_options, crawler_configuration)
-        self.user_config_dir = self.persister.CONFIG_DIR
+        self.user_config_dir = self.persister.CONFIG_DIR or "/tmp/wapiti_config"
         if not os.path.isdir(self.user_config_dir):
             os.makedirs(self.user_config_dir)
 

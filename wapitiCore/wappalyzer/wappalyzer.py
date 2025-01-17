@@ -331,15 +331,15 @@ def detect_versions_normalize_dict(rules: dict, contents) -> Set[str]:
         # If the key is in lowercase, we erase 'contents' by its lowercased-key version
         if (key in contents) or (key in (contents := lowercase_keys_content)):
             # regex_params is a list : [{"application_pattern": "..", "regex": "re.compile(..)"}, ...]
-            for i, _ in enumerate(regex_params):
+            for expression in regex_params:
                 for content_value in contents[key]:
                     # If the regex fails, it can be due to the fact that we are looking for the key instead
                     # The value can be set to the key so we compare
-                    if re.search(regex_params[i]['regex'], content_value) or\
-                       regex_params[i]['application_pattern'] == key.lower():
+                    if re.search(expression['regex'], content_value) or\
+                       expression['application_pattern'] == key.lower():
                         # Use that special string to show we detected the app once but not necessarily a version
                         versions.add("__detected__")
-                        versions.update(extract_version(regex_params[i], content_value))
+                        versions.update(extract_version(expression, content_value))
     return versions
 
 

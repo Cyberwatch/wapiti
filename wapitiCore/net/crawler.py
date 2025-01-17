@@ -18,21 +18,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# Standard libraries
+import asyncio
+import functools
+import ssl
+from typing import Dict
 from urllib.parse import urlparse, urlunparse
 import warnings
-import functools
-from typing import Dict
-import asyncio
-import ssl
 
-# Third-parties
 import httpx
+# https://github.com/ulodciv/httpx-ntlm
+from httpx_ntlm import HttpNtlmAuth
 
-# Internal libraries
-from wapitiCore.net import web
 from wapitiCore.net.classes import CrawlerConfiguration
-
+from wapitiCore.net import web
 from wapitiCore.net.response import Response
 
 warnings.filterwarnings(action='ignore', category=UserWarning, module='bs4')
@@ -145,8 +143,6 @@ class AsyncCrawler:
                     configuration.http_credential.password
                 )
             elif configuration.http_credential.method == "ntlm":
-                # https://github.com/ulodciv/httpx-ntlm
-                from httpx_ntlm import HttpNtlmAuth
                 auth = HttpNtlmAuth(
                     configuration.http_credential.username,  # username should be in the form "domain\user"
                     configuration.http_credential.password

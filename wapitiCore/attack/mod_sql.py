@@ -318,20 +318,23 @@ class ModuleSql(Attack):
                 if regex.search(data):
                     return f"SQL Injection (DBMS: {dbms})"
 
-        # Can't guess the DBMS but may be useful
-        if "Unclosed quotation mark after the character string" in data:
-            return ".NET SQL Injection"
-        if "StatementCallback; bad SQL grammar" in data:
-            return "Spring JDBC Injection"
+        # Define a mapping of patterns to their corresponding injection types
+        pattern_to_injection = {
+            "Unclosed quotation mark after the character string": ".NET SQL Injection",
+            "StatementCallback; bad SQL grammar": "Spring JDBC Injection",
+            "XPathException": "XPath Injection",
+            "Warning: SimpleXMLElement::xpath():": "XPath Injection",
+            "Error parsing XPath": "XPath Injection"
+        }
 
-        if "XPathException" in data:
-            return "XPath Injection"
-        if "Warning: SimpleXMLElement::xpath():" in data:
-            return "XPath Injection"
-        if "Error parsing XPath" in data:
-            return "XPath Injection"
+        # Check for each pattern
+        for pattern, injection_type in pattern_to_injection.items():
+            if pattern in data:
+                return injection_type
 
-        return ""
+        # Default return
+        return False
+
 
     async def is_false_positive(self, request):
         try:

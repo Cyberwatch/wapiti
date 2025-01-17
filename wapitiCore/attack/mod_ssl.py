@@ -16,21 +16,21 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # https://badssl.com/ can help to test the module
+import asyncio
+from collections import defaultdict
+from datetime import datetime, timezone
 import fnmatch
+import json
 import os
+from os.path import join as path_join, exists
+import re
+import shutil
 import socket
 import ssl
 import subprocess
-from datetime import datetime, timezone
-import json
-import asyncio
-from os.path import join as path_join, exists
-from typing import List, Tuple, Optional, AsyncIterator
-from collections import defaultdict
-import xml.etree.ElementTree as ET
-import re
 import tempfile
-import shutil
+from typing import List, Tuple, Optional, AsyncIterator
+import xml.etree.ElementTree as ET
 
 from httpx import RequestError
 import humanize
@@ -163,14 +163,14 @@ async def process_cert_info(xml_file: str) -> AsyncIterator[Tuple[int, str]]:
             log_orange(message)
             yield MEDIUM_LEVEL, message
 
-        not_valid_after = sslscan_date_to_utc(cert.find("not-valid-after").text)
-        utcnow = datetime.utcnow().replace(tzinfo=timezone.utc)
-        if not_valid_after > utcnow:
-            message = "Certificate expires in " + humanize.precisedelta(not_valid_after - utcnow)
+        not_valid_after_utc = sslscan_date_to_utc(cert.find("not-valid-after").text)
+        utcnow = datetime.now(timezone.utc).replace(tzinfo=timezone.utc)
+        if not_valid_after_utc > utcnow:
+            message = "Certificate expires in " + humanize.precisedelta(not_valid_after_utc - utcnow)
             log_green(message)
             yield INFO_LEVEL, message
         else:
-            message = f"Certificate has expired at {not_valid_after}"
+            message = f"Certificate has expired at {not_valid_after_utc}"
             log_red(message)
             yield CRITICAL_LEVEL, message
 
@@ -249,12 +249,10 @@ async def process_vulnerabilities(xml_file: str) -> AsyncIterator[Tuple[int, str
         message = f"Server is vulnerable to Heartbleed attack via {', '.join(vulnerable_protocols)}"
         log_red(message)
         yield CRITICAL_LEVEL, message
-
     if root.find(".//compression[@supported='1']"):
         message = "Server is vulnerable to CRIME attack (compression is supported)"
         log_red(message)
         yield CRITICAL_LEVEL, message
-
     if root.find(".//fallback[@supported='1']"):
         message = "Server is vulnerable to OpenSSL CCS (CVE-2014-0224)"
         log_red(message)

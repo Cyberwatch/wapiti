@@ -86,7 +86,7 @@ class ModuleCitrix(Attack):
                     matches = soup.find_all('span', string=lambda string: string in product_names)
                     if matches:
                         # Set product_name to the first matched product name
-                        self.device_name = matches[0].text
+                        self.device_name = matches[0].string
                     else:
                         self.device_name = "Citrix"
                     return True

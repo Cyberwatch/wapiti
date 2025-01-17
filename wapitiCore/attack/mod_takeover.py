@@ -86,7 +86,9 @@ class TakeoverChecker:
 
         return False
 
+    # pylint: disable=too-many-return-statements
     async def check(self, origin: str, domain: str) -> bool:
+
         if "." not in domain or domain.endswith((".local", ".internal")):
             # Stuff like "localhost": internal CNAMEs we can't control
             return False
@@ -116,9 +118,10 @@ class TakeoverChecker:
                                     response = await client.head(f"https://github.com/{username}", timeout=10.)
                                     if response.is_client_error:
                                         return True
+
                             except httpx.RequestError:
                                 logging.warning(f"HTTP request to https://github.com/{username} failed")
-                            return False
+                            break
 
                         search = MY_SHOPIFY_REGEX.search(domain)
                         if search:
@@ -140,7 +143,7 @@ class TakeoverChecker:
                             except httpx.RequestError:
                                 logging.warning("HTTP request to Shopify API failed")
 
-                            return False
+                            break
 
                         return True
 
@@ -150,7 +153,7 @@ class TakeoverChecker:
                             await dns.asyncresolver.resolve(domain)
                         except dns.asyncresolver.NXDOMAIN:
                             return True
-                        except BaseException:
+                        except BaseException: # pylint: disable=broad-exception-caught
                             continue
 
         # What remains is potentially unregistered domain.
@@ -167,7 +170,7 @@ class TakeoverChecker:
             await dns.asyncresolver.resolve(root_domain, "SOA", raise_on_no_answer=False)
         except dns.resolver.NXDOMAIN:
             return True
-        except BaseException as exception:
+        except BaseException as exception: # pylint: disable=broad-exception-caught
             logging.warning(f"ANY request for {root_domain}: {exception}")
 
         return False

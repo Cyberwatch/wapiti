@@ -4,13 +4,13 @@ stages:
   - update
 
 variables:
-  PYTHON_10_IMAGE: "docker.io/library/python:3.10-slim-bullseye"
-  PYTHON_11_IMAGE: "docker.io/library/python:3.11-slim-bullseye"
+  PYTHON_12_IMAGE: "docker.io/library/python:3.12-slim-bullseye"
+  PYTHON_13_IMAGE: "docker.io/library/python:3.13-slim-bullseye"
   ACCESS_TOKEN_NAME: "gitlab-ci-token"
 
 check_coding_style:
   stage: code_style
-  image: $PYTHON_10_IMAGE
+  image: $PYTHON_12_IMAGE
   tags:
     - docker-wapiti
   rules:
@@ -22,10 +22,9 @@ check_coding_style:
   before_script:
     - python -m pip install --upgrade pip
     - pip install -e .
-    - pip install "pylint==2.12.2"
-    - pip install "pylint-ignore==2022.1025"
+    - pip install "pylint~=3.3"
   script:
-    - pylint-ignore --rcfile=.pylintrc wapitiCore
+    - pylint --rcfile=.pylintrc wapitiCore
 
 test-python:
   stage: tests
@@ -37,7 +36,7 @@ test-python:
         $CI_PIPELINE_SOURCE == "merge_request_event"
   parallel:
     matrix:
-      - PYTHON_IMAGE: [$PYTHON_10_IMAGE, $PYTHON_11_IMAGE]
+      - PYTHON_IMAGE: [$PYTHON_12_IMAGE, $PYTHON_13_IMAGE]
   image: $PYTHON_IMAGE
   before_script:
     - python -c "import sys; print(sys.version)"
@@ -48,9 +47,12 @@ test-python:
     - tar -xjf /tmp/firefox.tar.bz2 -C /tmp/
     - mv /tmp/firefox /opt/firefox
     - ln -s /opt/firefox/firefox /usr/bin/firefox
+    - curl -sL -o /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz
+    - tar -xvf /tmp/geckodriver.tar.gz -C /tmp/
+    - mv /tmp/geckodriver /usr/local/bin/
+    - chmod +x /usr/local/bin/geckodriver
     - python -m pip install --upgrade pip
-    - pip install -U setuptools webdrivermanager
-    - webdrivermanager firefox --linkpath /usr/local/bin
+
     - pip3 install .[test]
   script:
     - pytest --cov --cov-report term --cov-report xml:coverage.xml

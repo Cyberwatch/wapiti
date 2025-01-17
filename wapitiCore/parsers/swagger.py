@@ -302,8 +302,8 @@ class Swagger:
                 elif self.swagger_dict['host']:
                     route_parsed = route.split(self.swagger_dict['host'])[1]
                 else:
+                    route_parsed = ""
                     # we will use the target url from -u option
-                    pass
                 method = route.split(' ')[0].lower()
                 param = self.swagger_dict['paths'][route_parsed][method]['parameters'][0]['schema']
                 if not 'type' in param:
@@ -329,8 +329,8 @@ class Swagger:
             elif self.swagger_dict['host']:
                 route_parsed = route.split(self.swagger_dict['host'])[1]
             else:
+                route_parsed = ""
                 # we will use the target url from -u option
-                pass
             method = route.split(' ')[0].lower()
             if not 'type' in param:
                 param = self.swagger_dict['paths'][route_parsed][method]['parameters'][0]['schema']

@@ -1,19 +1,20 @@
+from datetime import datetime, timedelta, timezone
+import http.server
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 from multiprocessing import Process
 import os
+import ssl
 import sys
 from time import sleep
-import http.server
-import ssl
 from unittest.mock import AsyncMock
-from datetime import datetime, timedelta
 
-import httpx
-import pytest
-import respx
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
+import httpx
+import pytest
+import respx
 
 from wapitiCore.net.classes import CrawlerConfiguration
 from wapitiCore.net import Request
@@ -26,16 +27,13 @@ from wapitiCore.attack.mod_ssl import (
 
 
 def https_server(cert_directory: str):
-    server_address = ("127.0.0.1", 4443)
-    httpd = http.server.HTTPServer(server_address, http.server.SimpleHTTPRequestHandler)
-    httpd.socket = ssl.wrap_socket(
-        httpd.socket,
-        server_side=True,
-        certfile=os.path.join(cert_directory, "cert.pem"),
-        keyfile=os.path.join(cert_directory, "key.pem"),
-        ssl_version=ssl.PROTOCOL_TLS
-    )
-    httpd.serve_forever()
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain(certfile=cert_directory+'cert.pem', keyfile=cert_directory+'key.pem')
+    context.check_hostname = False
+
+    with HTTPServer(("127.0.0.1", 4443), SimpleHTTPRequestHandler) as httpd:
+        httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
+        httpd.serve_forever()
 
 
 @pytest.fixture(autouse=True)
@@ -157,9 +155,9 @@ def generate_cert(include_organization_name: bool = True, include_ocsp_must_stap
     ).serial_number(
         x509.random_serial_number()
     ).not_valid_before(
-        datetime.utcnow()
+        datetime.now(timezone.utc)
     ).not_valid_after(
-        datetime.utcnow() + timedelta(days=10)
+        datetime.now(timezone.utc) + timedelta(days=10)
     ).add_extension(
         x509.SubjectAlternativeName([x509.DNSName(u"localhost")]),
         critical=False,

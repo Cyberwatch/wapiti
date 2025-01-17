@@ -30,7 +30,8 @@ confidence=
 # --disable=W"
 disable=too-few-public-methods,too-many-instance-attributes,too-many-arguments,import-error,
   logging-format-interpolation,not-an-iterable,too-many-public-methods,fixme,
-  missing-function-docstring,missing-class-docstring,missing-module-docstring,invalid-name
+  missing-function-docstring,missing-class-docstring,missing-module-docstring,invalid-name,
+  R0917
 
 [FORMAT]
 

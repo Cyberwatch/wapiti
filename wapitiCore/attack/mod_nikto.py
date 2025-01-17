@@ -180,28 +180,42 @@ class ModuleNikto(Attack):
                     await task
                     tasks.remove(task)
 
+    def process_path(self, path):
+        """Process the path by replacing placeholders"""
+        replacements = {
+            "@CGIDIRS": "/cgi-bin/",
+            "@ADMIN": "/admin/",
+            "@NUKE": "/modules/",
+            "@PHPMYADMIN": "/phpMyAdmin/",
+            "@POSTNUKE": "/postnuke/"
+        }
+
+        for placeholder, replacement in replacements.items():
+            path = path.replace(placeholder, replacement)
+
+        # Handle JUNK replacement
+        path = re.sub(r"JUNK\((\d+)\)", lambda x: self.junk_string[:int(x.group(1))], path)
+
+        if path[0] == "@":
+            return None
+
+        if not path.startswith("/"):
+            path = "/" + path
+
+        return path
+
+    # pylint: disable-msg=too-many-locals
     async def process_line(self, line):
         match = match_or = match_and = False
         fail = fail_or = False
 
-        osv_id = line[1]
-        path = line[3]
-        method = line[4]
-        vuln_desc = line[10]
-        post_data = line[11]
+        # Extract data from line
+        osv_id, path, method, vuln_desc, post_data = line[1], line[3], line[4], line[10], line[11]
 
-        path = path.replace("@CGIDIRS", "/cgi-bin/")
-        path = path.replace("@ADMIN", "/admin/")
-        path = path.replace("@NUKE", "/modules/")
-        path = path.replace("@PHPMYADMIN", "/phpMyAdmin/")
-        path = path.replace("@POSTNUKE", "/postnuke/")
-        path = re.sub(r"JUNK\((\d+)\)", lambda x: self.junk_string[:int(x.group(1))], path)
+        path = self.process_path(path)
 
-        if path[0] == "@":
+        if not path:
             return
-
-        if not path.startswith("/"):
-            path = "/" + path
 
         try:
             url = f"{self.parts.scheme}://{self.parts.netloc}{path}"
@@ -227,7 +241,7 @@ class ModuleNikto(Attack):
         except (RequestError, ConnectionResetError):
             self.network_errors += 1
             return
-        except Exception as exception:
+        except Exception as exception: # pylint: disable=broad-exception-caught
             logging.warning(f"{exception} occurred with URL {evil_request.url}")
             return
 

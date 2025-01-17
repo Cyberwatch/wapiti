@@ -192,7 +192,6 @@ class MitmFlowToWapitiRequests:
                 (request, response)
             )
 
-
 async def launch_proxy(
         port: int,
         data_queue: asyncio.Queue,
@@ -277,7 +276,6 @@ async def click_in_webpage(headless_client, request: Request, wait_time: float, 
                 current_url = await headless_client.get_url()
                 if current_url != request.url_with_fragment:
                     await headless_client.get(request.url_with_fragment, timeout=timeout)
-
 
 async def launch_headless_explorer(
         stop_event: asyncio.Event,
