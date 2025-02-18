@@ -525,7 +525,7 @@ def parse_args():
 
     parser.add_argument(
         "--cms",
-        help="Choose the CMS to scan. Possible choices : drupal, joomla, magento, prestashop, spip, wp",
+        help="Choose the CMS to scan. Possible choices : drupal, joomla, magento, prestashop, spip, typo3, wp",
         metavar="CMS_LIST"
     )
 
