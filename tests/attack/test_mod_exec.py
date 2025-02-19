@@ -194,7 +194,7 @@ async def test_no_false_positive_content_type_based():
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 1, "level": 1}
 
-        module = ModuleExec(crawler, persister, options, Event(), crawler_configuration)
+        module = ModuleExec(crawler, persister, options, crawler_configuration)
         module.do_post = False
 
         payloads_until_sleep = 0
@@ -241,7 +241,7 @@ async def test_no_false_positive_file_extension_based():
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 1, "level": 1}
 
-        module = ModuleExec(crawler, persister, options, Event(), crawler_configuration)
+        module = ModuleExec(crawler, persister, options, crawler_configuration)
         module.do_post = False
 
         payloads_until_sleep = 0

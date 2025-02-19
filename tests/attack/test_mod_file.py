@@ -124,7 +124,7 @@ async def test_image_with_parameter():
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2}
 
-        module = ModuleFile(crawler, persister, options, Event(), crawler_configuration)
+        module = ModuleFile(crawler, persister, options, crawler_configuration)
         await module.attack(request)
 
         assert persister.add_payload.call_count == 0

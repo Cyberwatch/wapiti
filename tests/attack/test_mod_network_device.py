@@ -328,7 +328,7 @@ async def test_detect_fortinet_from_main_app_class():
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "tasks": 20}
 
-        module = ModuleNetworkDevice(crawler, persister, options, Event(), crawler_configuration)
+        module = ModuleNetworkDevice(crawler, persister, options, crawler_configuration)
 
         await module.attack(request)
 
@@ -529,7 +529,7 @@ async def test_detect_fortinet_ssl_vpn():
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "tasks": 20}
 
-        module = ModuleNetworkDevice(crawler, persister, options, Event(), crawler_configuration)
+        module = ModuleNetworkDevice(crawler, persister, options, crawler_configuration)
 
         await module.attack(request)
 
@@ -569,7 +569,7 @@ async def test_detect_fortiweb():
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "tasks": 20}
 
-        module = ModuleNetworkDevice(crawler, persister, options, Event(), crawler_configuration)
+        module = ModuleNetworkDevice(crawler, persister, options, crawler_configuration)
 
         await module.attack(request)
 
@@ -610,7 +610,7 @@ async def test_detect_fortgate_from_title():
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "tasks": 20}
 
-        module = ModuleNetworkDevice(crawler, persister, options, Event(), crawler_configuration)
+        module = ModuleNetworkDevice(crawler, persister, options, crawler_configuration)
 
         await module.attack(request)
 
@@ -1100,7 +1100,7 @@ async def test_detect_cve_forti():
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "tasks": 20}
 
-        module = ModuleNetworkDevice(crawler, persister, options, Event(), crawler_configuration)
+        module = ModuleNetworkDevice(crawler, persister, options, crawler_configuration)
 
         await module.attack(request)
 
