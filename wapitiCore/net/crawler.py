@@ -157,7 +157,7 @@ class AsyncCrawler:
             headers=headers,
             cookies=configuration.cookies,
             verify=ssl_context,
-            proxies=cls._proxy_url_to_dict(configuration.proxy),
+            mounts=cls._proxy_url_to_dict(configuration.proxy),
             timeout=configuration.timeout,
             event_hooks={"request": [drop_cookies_from_request]} if configuration.drop_cookies else None,
         )
@@ -181,8 +181,8 @@ class AsyncCrawler:
             protocol = "socks5"
 
         return {
-            "http://": urlunparse((protocol, url_parts.netloc, '/', '', '', '')),
-            "https://": urlunparse((protocol, url_parts.netloc, '/', '', '', '')),
+            "http://": httpx.AsyncHTTPTransport(proxy=urlunparse((protocol, url_parts.netloc, '/', '', '', ''))),
+            "https://": httpx.AsyncHTTPTransport(proxy=urlunparse((protocol, url_parts.netloc, '/', '', '', ''))),
         }
 
     @property

@@ -83,7 +83,7 @@ class ModuleCitrix(Attack):
                 if "NetScaler" in title:
                     # Search the product name in the content
                     product_names = ["NetScaler ADC", "Citrix NetScaler", "NetScaler", "NetScaler AWS"]
-                    matches = soup.find_all('span', text=lambda text: text in product_names)
+                    matches = soup.find_all('span', string=lambda string: string in product_names)
                     if matches:
                         # Set product_name to the first matched product name
                         self.device_name = matches[0].text

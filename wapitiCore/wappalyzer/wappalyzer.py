@@ -187,6 +187,10 @@ class ApplicationData:
         css_selector = list(dom.keys())[0]
         value = dom[css_selector]
         if value == "":
+            if "\\;" in css_selector:
+                css_selector, value =css_selector.split("\\;")
+                value="\\;"+value
+                return {css_selector : {"exists":value}}
             return {css_selector : {"exists": ""}}
         return dom
 
