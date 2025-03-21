@@ -62,6 +62,7 @@ all_modules = {
     "network_device",
     "nikto",
     "permanentxss",
+    "printer",
     "redirect",
     "shellshock",
     "spring4shell",
