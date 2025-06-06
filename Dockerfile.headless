@@ -11,7 +11,7 @@ RUN pip install . --break-system-packages
 
 FROM python:3.12-slim
 
-ARG firefox_ver=138.0
+ARG firefox_ver=139.0
 ARG geckodriver_ver=0.36.0
 
 ENV DEBIAN_FRONTEND=noninteractive \
