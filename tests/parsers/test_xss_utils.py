@@ -10,6 +10,10 @@ from wapitiCore.net.crawler import Response
 
 
 def test_title_context():
+    """
+    The <title> element cannot contain HTML markup. The HTML parser treat any tags
+    inside <title> as literal text, so the context "parent" for "injection" is "title" (not "strong")
+    """
     html = """<html>
     <head><title><strong>injection</strong></title>
     <body>
@@ -17,18 +21,43 @@ def test_title_context():
     </html>"""
 
     assert get_context_list(html, "injection") == [
-        {"non_exec_parent": "title", "parent": "strong", "type": "text"}
+        {"non_exec_parent": "title", "parent": "title", "type": "text"}
     ]
 
 
-def test_noscript_context():
+def test_noscript_context_inside_textarea():
+    """
+    This test checks how the parser handles content inside a <textarea> element.
+    According to the HTML standard, everything inside <textarea> is treated as plain text, not as nested HTML tags.
+    """
     html = """<html>
     <head><title>Hello there</title>
     <body>
     <noscript>
     <textarea>
     <a href="injection">General Kenobi</a>
-    <textarea>
+    </textarea>
+    </noscript>
+    </body>
+    </html>"""
+
+    assert get_context_list(html, "injection") == [
+        {"type": "text", "parent": "textarea", "non_exec_parent": "noscript"}
+    ]
+
+def test_noscript_context():
+    """
+    This test compares the previous case, but replaces <textarea> with <p>.
+    In this situation, the content inside <p> is parsed as normal HTML, so the <a> element is recognized
+    as a real tag with an "href" attribute.
+    """
+    html = """<html>
+    <head><title>Hello there</title>
+    <body>
+    <noscript>
+    <p>
+    <a href="injection">General Kenobi</a>
+    </p>
     </noscript>
     </body>
     </html>"""
@@ -54,7 +83,7 @@ def test_comment_context():
     <noscript>
     <textarea>
     <a href="injection">General Kenobi</a>
-    <textarea>
+    </textarea>
     </noscript>
     -->
     </body>
@@ -70,17 +99,17 @@ def test_comment_in_noscript_context():
     <head><title>Hello there</title>
     <body>
     <noscript>
-    <textarea>
+    <p>
     <!--
     <a href="injection">General Kenobi</a>
     -->
-    <textarea>
+    </p>
     </noscript>
     </body>
     </html>"""
 
     assert get_context_list(html, "injection") == [
-        {"non_exec_parent": "noscript", "parent": "textarea", "type": "comment"}
+        {"non_exec_parent": "noscript", "parent": "p", "type": "comment"}
     ]
 
 
