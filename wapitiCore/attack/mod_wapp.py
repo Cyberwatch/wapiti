@@ -49,23 +49,34 @@ MSG_CPE = "  -> CPE: {0}"
 BULK_SIZE = 50
 VERSION_REGEX = re.compile(r"^\d[\w.-]*$")
 
-SCRIPT = (
-    "wapiti_results = {};\n"
-    "for (var js_tech in wapiti_tests) {\n"
-    "  js_tech_results = [];\n"
-    "  for (var i in wapiti_tests[js_tech]) {\n"
-    "    try {\n"
-    "      js_tech_results.push([String(eval(wapiti_tests[js_tech][i])), wapiti_tests[js_tech][i]]);\n"
-    "    } catch(wapiti_error) {\n"
-    "      continue;\n"
-    "    }\n"
-    "  }\n"
-    "  if (js_tech_results.length) {\n"
-    "    wapiti_results[js_tech] = js_tech_results;\n"
-    "  }\n"
-    "}\n"
-    "return wapiti_results;\n"
-)
+SCRIPT = """
+function resolvePath(path) {
+    try {
+        return path.split('.').reduce((acc, key) => {
+            if (acc === undefined || acc === null) return undefined;
+            return acc[key];
+        }, window);
+    } catch(e) {
+        return undefined;
+    }
+}
+
+var wapiti_results = {};
+for (var js_tech in wapiti_tests) {
+    var js_tech_results = [];
+    for (var i in wapiti_tests[js_tech]) {
+        var path = wapiti_tests[js_tech][i];
+        var value = resolvePath(path);
+        if (value !== undefined) {
+            js_tech_results.push([String(value), path]);
+        }
+    }
+    if (js_tech_results.length) {
+        wapiti_results[js_tech] = js_tech_results;
+    }
+}
+return wapiti_results;
+"""
 
 
 def _is_valid_json(response):
@@ -431,49 +442,49 @@ class ModuleWapp(Attack):
         technologies_file_path = os.path.join(self.user_config_dir, self.WAPP_TECHNOLOGIES)
         final_results = {}
 
-        with open(technologies_file_path, encoding="utf-8") as fd:
-            data = json.load(fd)
-            try:
-                async with get_session(service, browser) as headless_client:
-                    await headless_client.get(url, timeout=self.crawler_configuration.timeout)
-                    await asyncio.sleep(5)
-                    for tests in get_tests(data):
-                        script = f"wapiti_tests = {json.dumps(tests)};\n" + SCRIPT
-                        try:
-                            results = await headless_client.execute_script(script)
-                            for software, version_and_js in results.items():
-                                waiting_version = []
-                                validated = False
-                                for version, js in version_and_js:
-                                    expected_format = data[software]["js"][js]
-                                    if version == "undefined":
-                                        continue
+        try:
+            with open(technologies_file_path, encoding="utf-8") as fd:
+                data = json.load(fd)
+            async with get_session(service, browser) as headless_client:
+                await headless_client.get(url, timeout=self.crawler_configuration.timeout)
+                await asyncio.sleep(5)
+                for tests in get_tests(data):
+                    script = f"wapiti_tests = {json.dumps(tests)};\n" + SCRIPT
+                    try:
+                        results = await headless_client.execute_script(script)
+                        for software, version_and_js in results.items():
+                            waiting_version = []
+                            validated = False
+                            for version, js in version_and_js:
+                                expected_format = data[software]["js"][js]
+                                if version == "undefined":
+                                    continue
 
-                                    if not expected_format or expected_format.startswith(r"\;confidence:"):
-                                        if VERSION_REGEX.match(version):
-                                            # some false positives here
-                                            final_results[software] = [version]
-                                            break
-                                        if software not in final_results:
-                                            validated = True
-                                            final_results[software] = []
-                                    elif expected_format.startswith(r"\;version:"):
-                                        final_results[software] = [expected_format.split(':')[1]]
-                                    elif isinstance(version, str):
-                                        if r"\;confidence:0" in expected_format:
-                                            waiting_version.append(version)
-                                        elif r"\;version:" in expected_format:
-                                            final_results[software] = [version]
-                                            break
-                                    # Other cases seems to be some kind of false positives
-                                if validated and waiting_version and not final_results[software]:
-                                    final_results[software] = waiting_version
-                        except (JavascriptError, UnknownError) as exception:
-                            logging.exception(exception)
-                            continue
+                                if not expected_format or expected_format.startswith(r"\;confidence:"):
+                                    if VERSION_REGEX.match(version):
+                                        # some false positives here
+                                        final_results[software] = [version]
+                                        break
+                                    if software not in final_results:
+                                        validated = True
+                                        final_results[software] = []
+                                elif expected_format.startswith(r"\;version:"):
+                                    final_results[software] = [expected_format.split(':')[1]]
+                                elif isinstance(version, str):
+                                    if r"\;confidence:0" in expected_format:
+                                        waiting_version.append(version)
+                                    elif r"\;version:" in expected_format:
+                                        final_results[software] = [version]
+                                        break
+                                        # Other cases seems to be some kind of false positives
+                            if validated and waiting_version and not final_results[software]:
+                                final_results[software] = waiting_version
+                    except (JavascriptError, UnknownError) as exception:
+                        logging.exception(exception)
+                        continue
 
-            except (ArsenicError, FileNotFoundError, asyncio.TimeoutError):
+        except (ArsenicError, FileNotFoundError, asyncio.TimeoutError):
                 # Geckodriver may be missing, etc
-                pass
+            pass
 
         return final_results
