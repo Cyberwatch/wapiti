@@ -594,7 +594,7 @@ async def test_merge_with_and_without_redirection():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_raise_on_invalid_json():
+async def test_raise_on_invalid_json(tmp_path):
     """Tests that a ValueError is raised when calling _dump_url_content_to_file with invalid or empty Json."""
 
     respx.get("http://perdu.com/src/categories.json").mock(
@@ -604,6 +604,7 @@ async def test_raise_on_invalid_json():
     )
 
     persister = AsyncMock()
+    persister.CONFIG_DIR = str(tmp_path / "config")
     crawler_configuration = CrawlerConfiguration(Request("http://perdu.com/"))
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "wapp_url": "http://perdu.com"}
@@ -617,7 +618,7 @@ async def test_raise_on_invalid_json():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_raise_on_not_valid_db_url():
+async def test_raise_on_not_valid_db_url(tmp_path):
     """Tests that a ValueError is raised when the URL doesn't contain a Wapp DB."""
     cat_url = "http://perdu.com/src/categories.json"
     group_url = "http://perdu.com/src/groups.json"
@@ -629,6 +630,7 @@ async def test_raise_on_not_valid_db_url():
             content="Not Found")
     )
     persister = AsyncMock()
+    persister.CONFIG_DIR = str(tmp_path / "config")
     crawler_configuration = CrawlerConfiguration(Request("http://perdu.com/"))
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "wapp_url": "http://perdu.com/"}
@@ -643,7 +645,7 @@ async def test_raise_on_not_valid_db_url():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_raise_on_value_error():
+async def test_raise_on_value_error(tmp_path):
     """Tests that a ValueError is raised when calling the _load_wapp_database function when the json is not valid."""
 
     example_json_content = json.dumps({
@@ -681,6 +683,7 @@ async def test_raise_on_value_error():
             content="No Json")
     )
     persister = AsyncMock()
+    persister.CONFIG_DIR = str(tmp_path / "config")
     crawler_configuration = CrawlerConfiguration(Request("http://perdu.com/"))
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "wapp_url": "http://perdu.com/"}
@@ -695,7 +698,7 @@ async def test_raise_on_value_error():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_raise_on_request_error():
+async def test_raise_on_request_error(tmp_path):
     """Tests that a RequestError is raised when calling the _load_wapp_database function with wrong URL."""
 
     cat_url = "http://perdu.com/src/categories.json"
@@ -704,6 +707,7 @@ async def test_raise_on_request_error():
 
     respx.get(url__regex=r"http://perdu.com/.*").mock(side_effect=RequestError("RequestError occurred: [Errno -2] Name or service not known"))
     persister = AsyncMock()
+    persister.CONFIG_DIR = str(tmp_path / "config")
     crawler_configuration = CrawlerConfiguration(Request("http://perdu.com/"))
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "wapp_url": "http://perdu.com/"}
@@ -718,13 +722,14 @@ async def test_raise_on_request_error():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_raise_on_request_error_for_dump_url():
+async def test_raise_on_request_error_for_dump_url(tmp_path):
     """Tests that a RequestError is raised when calling the _dump_url_content_to_file function with wrong URL."""
 
     url = "http://perdu.com/"
 
     respx.get(url__regex=r"http://perdu.com/.*").mock(side_effect=RequestError("RequestError occurred: [Errno -2] Name or service not known"))
     persister = AsyncMock()
+    persister.CONFIG_DIR = str(tmp_path / "config")
     crawler_configuration = CrawlerConfiguration(Request("http://perdu.com/"))
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "wapp_url": "http://perdu.com/"}
@@ -739,7 +744,7 @@ async def test_raise_on_request_error_for_dump_url():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_raise_on_request_error_for_update():
+async def test_raise_on_request_error_for_update(tmp_path):
     """Tests that a RequestError is raised when calling the update function with wrong URL."""
 
     url = "http://perdu.com/"
@@ -748,6 +753,7 @@ async def test_raise_on_request_error_for_update():
 
     respx.get(url__regex=r"http://perdu.com/.*").mock(side_effect=RequestError("RequestError occurred: [Errno -2] Name or service not known"))
     persister = AsyncMock()
+    persister.CONFIG_DIR = str(tmp_path / "config")
     crawler_configuration = CrawlerConfiguration(Request("http://perdu.com/"))
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "wapp_url": "http://perdu.com/"}
@@ -762,7 +768,7 @@ async def test_raise_on_request_error_for_update():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_raise_on_value_error_for_update():
+async def test_raise_on_value_error_for_update(tmp_path):
     """Tests that a ValueError is raised when calling the update function with URL doesn't contain a wapp DB."""
 
     respx.get(url__regex=r"http://perdu.com/src/technologies/.*").mock(
@@ -777,6 +783,7 @@ async def test_raise_on_value_error_for_update():
     )
 
     persister = AsyncMock()
+    persister.CONFIG_DIR = str(tmp_path / "config")
     crawler_configuration = CrawlerConfiguration(Request("http://perdu.com/"))
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "wapp_url": "http://perdu.com/"}
@@ -928,7 +935,7 @@ async def test_private_gitlab():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_raise_on_not_valid_directory_for_update():
+async def test_raise_on_not_valid_directory_for_update(tmp_path):
     """Tests that a ValueError is raised when calling update() with a directory that does not exist."""
     wapp_dir = "/"
 
@@ -938,6 +945,7 @@ async def test_raise_on_not_valid_directory_for_update():
             content="Not Found")
     )
     persister = AsyncMock()
+    persister.CONFIG_DIR = str(tmp_path / "config")
     crawler_configuration = CrawlerConfiguration(Request("http://perdu.com/"))
     async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
         options = {"timeout": 10, "level": 2, "wapp_dir": "/"}
@@ -966,7 +974,7 @@ def read_json_file(file_path):
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_raise_on_not_valid_json_for_update():
+async def test_raise_on_not_valid_json_for_update(tmp_path):
 
     """Tests that a ValueError is raised when calling update() with an invalid json file."""
     respx.get(url__regex=r"http://perdu.com/.*").mock(
@@ -983,6 +991,7 @@ async def test_raise_on_not_valid_json_for_update():
             # Mock builtins.open to provide content for the JSON files
             with patch('builtins.open', new_callable=mock_open, read_data='{"key": "value"}'):
                 persister = AsyncMock()
+                persister.CONFIG_DIR = str(tmp_path / "config")
                 crawler_configuration = CrawlerConfiguration(Request("http://perdu.com/"))
                 async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
                     options = {"timeout": 10, "level": 2, "wapp_dir": wapp_dir}
@@ -997,7 +1006,7 @@ async def test_raise_on_not_valid_json_for_update():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_raise_on_not_valid_json_file_for_update():
+async def test_raise_on_not_valid_json_file_for_update(tmp_path):
 
     """Tests that a ValueError is raised when calling update() with an invalid json file."""
     respx.get(url__regex=r"http://perdu.com/.*").mock(
@@ -1014,6 +1023,7 @@ async def test_raise_on_not_valid_json_file_for_update():
             # Mock builtins.open to provide content for the JSON files
             with patch('builtins.open', new_callable=mock_open, read_data='{"{key "value"}'):
                 persister = AsyncMock()
+                persister.CONFIG_DIR = str(tmp_path / "config")
                 crawler_configuration = CrawlerConfiguration(Request("http://perdu.com/"))
                 async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
                     options = {"timeout": 10, "level": 2, "wapp_dir": wapp_dir}
@@ -1027,7 +1037,7 @@ async def test_raise_on_not_valid_json_file_for_update():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_raise_on_file_does_not_exist_for_update():
+async def test_raise_on_file_does_not_exist_for_update(tmp_path):
     """Tests that a ValueError is raised when calling update() with a missing json file."""
     respx.get(url__regex=r"http://perdu.com/.*").mock(
         return_value=httpx.Response(
@@ -1043,6 +1053,7 @@ async def test_raise_on_file_does_not_exist_for_update():
             # Mock builtins.open to provide content for the JSON files
             with patch('builtins.open', new_callable=mock_open, read_data='{"{key "value"}'):
                 persister = AsyncMock()
+                persister.CONFIG_DIR = str(tmp_path / "config")
                 crawler_configuration = CrawlerConfiguration(Request("http://perdu.com/"))
                 async with AsyncCrawler.with_configuration(crawler_configuration) as crawler:
                     options = {"timeout": 10, "level": 2, "wapp_dir": wapp_dir}
