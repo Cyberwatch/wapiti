@@ -4,8 +4,8 @@ stages:
   - update
 
 variables:
-  PYTHON_12_IMAGE: "docker.io/library/python:3.12-slim-trixie"
-  PYTHON_13_IMAGE: "docker.io/library/python:3.13-slim-trixie"
+  PYTHON_12_IMAGE: "docker.io/library/python:3.12-slim"
+  PYTHON_13_IMAGE: "docker.io/library/python:3.13-slim"
   ACCESS_TOKEN_NAME: "gitlab-ci-token"
 
 check_coding_style:
